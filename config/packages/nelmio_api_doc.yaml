@@ -1,0 +1,131 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Tennis Simulator
+            description: Tennis simulator challenge
+            version: 1.0.0
+        paths:
+            /api/v1/tournament/search:
+                post:
+                    description: Search tournaments already simulated.
+                    tags:
+                        - Tournament
+                    requestBody:
+                        content:
+                            application/json:
+                                schema: 
+                                    type: object
+                                    properties:
+                                        tournamentType: 
+                                            type: string
+                                            enum: ['male','female'] 
+                                            example: 'male'
+                                        date: 
+                                            type: string, 
+                                            example: '2023-01-23'
+                                        playerName: 
+                                            type: string 
+                                            example: 'John Doe'
+                    responses:
+                        200:
+                            description: Tournaments founded
+                            content:
+                                aplication/json:
+                                    schema: 
+                                        type: object
+                                        properties:
+                                            result:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/TournamentsResault'
+
+            /api/v1/tournament/simulate:
+                post:
+                    description: Simulate a tournament.
+                    tags:
+                        - Tournament
+                    requestBody:
+                        content:
+                            application/json:
+                                schema: 
+                                    type: object
+                                    required:
+                                        - tournamentType
+                                        - participants
+                                    properties:
+                                        tournamentType: 
+                                            type: string
+                                            enum: ['male','female']
+                                            example: 'male'
+                                        participants:
+                                            type: 
+                                                array
+                                            items: 
+                                                oneOf:
+                                                    - $ref: '#/components/schemas/FemalePlayer'
+                                                    - $ref: '#/components/schemas/MalePlayer'              
+                    responses:
+                        200:
+                            description: Tournament simulated successfully
+                            content:
+                                aplication/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            winner: {type: string, example: 'John Doe'}
+        tags:
+            - name: Tournament
+        components:
+            schemas:
+                Player:
+                    type: object
+                    required:
+                        - name
+                        - skill
+                    properties:
+                        name:
+                            type: string
+                            example: Player 1
+                            description: Player name
+                        skill:
+                            type: integer
+                            example: 90
+                            description: Skill number
+                MalePlayer:
+                    allOf:
+                        - $ref: '#/components/schemas/Player'
+                    type: object
+                    required:
+                        - strenght
+                        - velocity
+                    properties:
+                        strenght:
+                            type: integer
+                            example: 60
+                            description: Strenght number
+                        velocity:
+                            type: integer
+                            example: 80
+                            description: Velocity number
+                FemalePlayer:
+                    allOf:
+                        - $ref: '#/components/schemas/Player'
+                    type: object
+                    required:
+                        - reactionTime
+                    properties:
+                        reactionTime:
+                            type: integer
+                            example: 70
+                            description: Reaction time number
+                TournamentsResault:
+                    type: object
+                    properties:
+                        date:
+                            type: string
+                            description: Date of the tournament
+
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc|/doc.json$) # Accepts routes under /api except /api/doc
+    
